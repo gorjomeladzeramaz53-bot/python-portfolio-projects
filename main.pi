@@ -1,0 +1,55 @@
+import re
+
+# ფიქსირებული ფასი 1 ბილეთზე
+TICKET_PRICE = 15.0
+
+print("--- კინოთეატრის ბილეთების ონლაინ ჯავშანი ---")
+user_input = input("შეიყვანეთ შეკვეთა ერთ ხაზზე (მაგ: 'Minda 3cali bileti, bileti ghirs 15 lari'): ")
+
+try:
+    # 1. ტექსტიდან ყველა რიცხვის ამოღება re.findall()-ის გამოყენებით
+    numbers = re.findall(r'\d+', user_input)
+    
+    # 2. შემოწმება IndexError-ის რისკზე (თუ რიცხვები ვერ მოიძებნა)
+    if len(numbers) < 1:
+        raise ValueError("ტექსტში ვერ მოიძებნა ბილეთების რაოდენობა.")
+        
+    # ვიღებთ ბილეთების რაოდენობას
+    tickets_count = int(numbers[0])
+    
+    # 3. ხელოვნური შეცდომების აღძვრა (raise)
+    if tickets_count <= 0:
+        raise ValueError("ბილეთების რაოდენობა უნდა იყოს მინიმუმ 1")
+        
+    # გამოვთვალოთ ჯამური ღირებულება
+    total_cost = tickets_count * TICKET_PRICE
+    
+    # ვამოწმებთ, მომხმარებელმა მიუთითა თუ არა თანხა ტექსტში
+    if len(numbers) > 1:
+        paid_amount = float(numbers[1])
+    else:
+        # თუ თანხა არ წერია ტექსტში, ვთხოვთ დამატებით შემოტანას ან ვთვლით რომ არასაკმარისია
+        paid_amount = float(input(f"შეკვეთის ჯამური ღირებულებაა {total_cost} ლარი. გთხოვთ შეიტანოთ თანხა: "))
+
+    if paid_amount < total_cost:
+        raise ZeroDivisionError("თანხა არ არის საკმარისი")
+
+except IndexError:
+    print("[შეცდომა]: ტექსტიდან მონაცემების ამოღება ვერ მოხერხდა. გთხოვთ მიუთითოთ რიცხვები.")
+except ValueError as ve:
+    print(f"[შეცდომა]: {ve}")
+except ZeroDivisionError as zde:
+    print(f"[შეცდომა]: {zde} (გადახდილი თანხა ნაკლებია ჯამზე)")
+else:
+    # თუ ყველაფერმა წარმატებით ჩაიარა
+    change = paid_amount - total_cost
+    print("\n" + "="*30)
+    print("✅ ჯავშანი წარმატებით განხორციელდა!")
+    print(f"ბილეთების რაოდენობა: {tickets_count}")
+    print(f"სულ გადასახდელი: {total_cost:.2f} ლარი")
+    print(f"შემოსული თანხა: {paid_amount:.2f} ლარი")
+    print(f"საბოლოო ხურდა: {change:.2f} ლარი")
+    print("="*30)
+finally:
+    # ეს ბლოკი ყოველთვის შესრულდება
+    print("[სისტემა]: ტრანზაქციის მცდელობა დასრულდა.")
